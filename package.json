@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start -p 8088"
+    "start": "next start",
+	"stage": "pm2 start server.js --name vmc-sensetime"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.31",
