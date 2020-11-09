@@ -7,7 +7,7 @@ body {
   line-height: 1.6;
   font-size: 18px;
   width: 100%;
-  height: 1200px;
+  height: 650px;
   overflow: hidden;
 }
 
@@ -31,7 +31,7 @@ img {
 
 .main-layout {
   width: 100%;
-  height: 1200px;
+  height: 650px;
   font-family: sans-serif;
 }
 
@@ -39,7 +39,7 @@ img {
   border: 5px solid #288692;
   width: 100%;
   display: table;
-  height: 175px;
+  height: 100px;
 }
 
 .title-text {
@@ -47,7 +47,7 @@ img {
 
   vertical-align: middle;
   width: 100%;
-  font-size: 55px;
+  font-size: 35px;
   font-weight: 800;
   text-align: center;
   margin-top: 50%;
@@ -59,7 +59,7 @@ img {
 .text-box {
   border: 5px solid #288692;
   /* margin-left: 20px; */
-  height: 81%;
+  height: 73%;
   margin-top: 28px;
   margin-right: 10px;
   width: 100%;
@@ -67,7 +67,7 @@ img {
 
 .message {
   /* font-size: 40px; */
-  font-size: 33px;
+  font-size: 25px;
   color: #0a82be;
   text-align: center;
   font-weight: 700;
@@ -138,6 +138,6 @@ img {
 
 .cc-logo > img {
   /* width: 300px; */
-  height: 75px;
-  width: 187px;
+  height: 52px;
+  width: 130px;
 }

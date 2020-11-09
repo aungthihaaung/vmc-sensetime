@@ -19,16 +19,16 @@ import { url } from "inspector";
 // };
 
 const leftPanel = (
-  <div style={{ marginTop: 225 }}>
+  <div style={{ marginTop: 0 }}>
     <div>&nbsp;</div>
     <div style={{ textAlign: "center" }}>
       {" "}
       <img
         src={
-          "https://recledmi.sirv.com/Images/vmc_sense_time/man.gif?w=280&h=466"
+          "https://recledmi.sirv.com/Images/vmc_sense_time/man.gif?w=150&h=250"
         }
         alt="man"
-        style={{ maxWidth: 280 }}
+        style={{ maxWidth: 150 }}
       />
     </div>
   </div>
@@ -47,7 +47,7 @@ export default function Home(props) {
       <div className="cc-logo">
         <img
           src={
-            "https://recledmi.sirv.com/Images/vmc_sense_time/centricore.png?w=187&h=75"
+            "https://recledmi.sirv.com/Images/vmc_sense_time/centricore.png?w=130&h=52"
           }
           alt="centricore"
         />
@@ -62,8 +62,8 @@ export default function Home(props) {
       <div style={{ height: "100%", border: "0px solid red" }}>
         <table style={{ borderWidth: 0, height: "100%", width: "97%" }}>
           <tbody>
-            <tr style={{ height: 650 }}>
-              <td style={{ width: 180, padding: 0 }}>{leftPanel}</td>
+            <tr style={{}}>
+              <td style={{ width: 150, padding: 0 }}>{leftPanel}</td>
               <td rowSpan={2}>
                 <div style={{ height: "100%", position: "relative" }}>
                   <div className="parallelogram1"></div>
@@ -77,7 +77,7 @@ export default function Home(props) {
                       <tbody>
                         <tr>
                           <td
-                            style={{ verticalAlign: "bottom", height: "50%" }}
+                            style={{ verticalAlign: "middle", height: "50%" }}
                             className="message"
                           >
                             <div>
@@ -85,18 +85,6 @@ export default function Home(props) {
                                 typeof message1 === "string" &&
                                 Parser(message1)} */}
                               Please proceed to enter.
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td
-                            style={{ verticalAlign: "top" }}
-                            className="message"
-                          >
-                            <div style={{ height: "100%" }}>
-                              {/* {message2 &&
-                                typeof message2 === "string" &&
-                                Parser(message2)} */}
                             </div>
                           </td>
                         </tr>
