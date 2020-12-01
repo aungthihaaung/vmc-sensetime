@@ -1,53 +1,64 @@
-import Head from "next/head";
-import utilStyles from "../styles/utils.module.css";
-import Link from "next/link";
-import { GetStaticProps } from "next";
+import React, { useState } from "react";
+import { ScanVisitorResult } from "lib/types";
 
-import React, { useContext, useState } from "react";
-import { url } from "inspector";
+export const getServerSideProps = ({ query, res }) => {
+  return { props: { status: query.status } };
+};
 
-// https://centricore.app:xxxx/scan?visitor_id=xxxxxx&temp=36.8&device_id=xxxxx
-// https://centricore.app:8088/result?timeout=7000&status=success&visitor_id=xxxxxx&temp=36.8&device_id=xxxxx
-// export const getServerSideProps = async ({ query }) => {
-//   const { sessionId, flowNumber } = query;
+export default function Home({ status }) {
+  let leftSidePanelImgPath = "";
+  let leftSidePanelImgMaxWidth = 0;
+  let title = "";
+  let message = "";
+  let titleDivStyleClass = "";
 
-//   return {
-//     props: {
-//       status
-//     },
-//   };
-// };
+  if (status === ScanVisitorResult.OK) {
+    leftSidePanelImgPath =
+      // "https://recledmi.sirv.com/Images/vmc_sense_time/man.gif?w=150&h=250";
+      "/images/man.webp";
+    leftSidePanelImgMaxWidth = 150;
+    title = "THANK YOU";
+    titleDivStyleClass = "title-div-ok";
+    message = "Please Proceed to Enter";
+  } else if (status === ScanVisitorResult.NOT_FOUND) {
+    leftSidePanelImgPath =
+      // "https://recledmi.sirv.com/Images/vmc_sense_time/stop_sign.png?w=150&h=250";
+      "/images/stop_sign.webp";
+    leftSidePanelImgMaxWidth = 150;
+    title = "WARNING";
+    titleDivStyleClass = "title-div-not-found";
+    message = "No record found.";
+  } else if (status === ScanVisitorResult.BLACKLIST) {
+    leftSidePanelImgPath =
+      // "https://recledmi.sirv.com/Images/vmc_sense_time/stop_sign.png?w=150&h=250";
+      "/images/stop_sign.webp";
+    leftSidePanelImgMaxWidth = 150;
+    title = "ACCESS DENIED";
+    titleDivStyleClass = "title-div-not-found";
+    message = "YOU SHALL NOT PASS!!!";
+  }
 
-const leftPanel = (
-  <div style={{ marginTop: 0 }}>
-    <div>&nbsp;</div>
-    <div style={{ textAlign: "center" }}>
-      {" "}
-      <img
-        src={
-          "https://recledmi.sirv.com/Images/vmc_sense_time/man.gif?w=150&h=250"
-        }
-        alt="man"
-        style={{ maxWidth: 150 }}
-      />
+  const leftPanel = (
+    <div style={{ marginTop: 0 }}>
+      <div>&nbsp;</div>
+      <div style={{ textAlign: "center" }}>
+        {" "}
+        <img
+          src={leftSidePanelImgPath}
+          alt="man"
+          style={{ maxWidth: leftSidePanelImgMaxWidth }}
+        />
+      </div>
     </div>
-  </div>
-);
-
-export default function Home(props) {
-  const [selectedLang, setSelectedLang] = useState("en");
-
-  const selectLang = (code) => {
-    setSelectedLang(code);
-    console.log(code);
-  };
+  );
 
   return (
     <div className="main-layout">
       <div className="cc-logo">
         <img
           src={
-            "https://recledmi.sirv.com/Images/vmc_sense_time/centricore.png?w=130&h=52"
+            // "https://recledmi.sirv.com/Images/vmc_sense_time/centricore.png?w=130&h=52"
+            "/images/centricore.webp"
           }
           alt="centricore"
         />
@@ -55,8 +66,8 @@ export default function Home(props) {
       <div>
         <div style={{ height: 20 }}>&nbsp;</div>
       </div>
-      <div className="title-div">
-        <div className="title-text">THANK YOU</div>
+      <div className={titleDivStyleClass}>
+        <div className="title-text">{title}</div>
       </div>
 
       <div style={{ height: "100%", border: "0px solid red" }}>
@@ -84,7 +95,7 @@ export default function Home(props) {
                               {/* {message1 &&
                                 typeof message1 === "string" &&
                                 Parser(message1)} */}
-                              Please proceed to enter.
+                              {message}
                             </div>
                           </td>
                         </tr>

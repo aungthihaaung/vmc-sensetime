@@ -5,9 +5,7 @@ import LangSelector from "./LangSelector";
 export default function Navbar(props) {
   const [navbarOpen, setNavbarOpen] = React.useState(false);
 
-  useEffect(() => {
-    console.log(navbarOpen);
-  }, [navbarOpen]);
+  useEffect(() => {}, [navbarOpen]);
 
   return (
     <>

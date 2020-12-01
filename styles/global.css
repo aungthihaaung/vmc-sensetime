@@ -35,8 +35,15 @@ img {
   font-family: sans-serif;
 }
 
-.title-div {
+.title-div-ok {
   border: 5px solid #288692;
+  width: 100%;
+  display: table;
+  height: 100px;
+}
+
+.title-div-not-found {
+  border: 5px solid #a02543;
   width: 100%;
   display: table;
   height: 100px;
@@ -44,6 +51,7 @@ img {
 
 .title-text {
   display: table-cell;
+  background: #7cf37c;
 
   vertical-align: middle;
   width: 100%;
@@ -67,7 +75,7 @@ img {
 
 .message {
   /* font-size: 40px; */
-  font-size: 25px;
+  font-size: 45px;
   color: #0a82be;
   text-align: center;
   font-weight: 700;
