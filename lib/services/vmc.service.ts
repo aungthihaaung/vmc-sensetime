@@ -10,11 +10,11 @@ const doorOpen = (id: number) => {
 
   axios
     .post(`${setting.senseTimeApiUrl}/openDoor`, {
-      id,
+      id: 2,
       remark: "happy",
     })
     .then(function (response) {
-      logger.info(response);
+      logger.info(response.data);
     })
     .catch(function (error) {
       logger.info(error);
@@ -39,7 +39,7 @@ const scanVisitor = async (
   `,
       { visitorId }
     );
-
+    logger.info(regs.length);
     if (regs && regs.length > 0) {
       if (regs[0].isBlackList === 1) {
         return ScanVisitorResult.BLACKLIST;

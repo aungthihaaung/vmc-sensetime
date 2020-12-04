@@ -149,3 +149,14 @@ img {
   height: 52px;
   width: 130px;
 }
+
+.cc-logo-big {
+  position: absolute;
+  left: 29%;
+  top: 38%;
+}
+
+.cc-logo-big > img {
+  /* width: 300px; */
+  width: 165px;
+}

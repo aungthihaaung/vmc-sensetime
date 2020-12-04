@@ -2,15 +2,41 @@ import React, { useState } from "react";
 import { ScanVisitorResult } from "lib/types";
 
 export const getServerSideProps = ({ query, res }) => {
-  return { props: { status: query.status } };
+  return { props: { status: query.status, timeout: query.my_timeout } };
 };
 
-export default function Home({ status }) {
+export default function Home({ status, timeout }) {
+  const [showLoading, setShowLoading] = useState(false);
+
   let leftSidePanelImgPath = "";
   let leftSidePanelImgMaxWidth = 0;
   let title = "";
   let message = "";
   let titleDivStyleClass = "";
+
+  setTimeout(() => {
+    setShowLoading(true);
+  }, timeout);
+
+  if (showLoading) {
+    return (
+      <>
+        <div
+          className="cc-logo-big"
+          style={{ textAlign: "center", fontWeight: "bold" }}
+        >
+          <img
+            src={
+              // "https://recledmi.sirv.com/Images/vmc_sense_time/centricore.png?w=130&h=52"
+              "/images/centricore_big.webp"
+            }
+            alt="centricore"
+          />
+          <span style={{ paddingLeft: 23 }}>Processing...</span>
+        </div>
+      </>
+    );
+  }
 
   if (status === ScanVisitorResult.OK) {
     leftSidePanelImgPath =
