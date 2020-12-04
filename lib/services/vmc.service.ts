@@ -22,27 +22,36 @@ const doorOpen = (id: number) => {
 };
 
 const scanVisitor = async (
-  visitorId: number,
+  visitorId: string,
   temperature: number,
   deviceId: number
 ) => {
   try {
+    // @TEMP temporarily hard code for just demo.
+    // should read from staff_reg table when all are in sync.
+    if (visitorId.indexOf("ST_") === 0) {
+      return ScanVisitorResult.STAFF_OK;
+    }
+
     const regs = await sqlLib.query(
       sql`
-    select
-      id,
-      is_black_list isBlackList
-      from visitor_reg
-      where 1=1
-          and record_status = 'A'
-          and reg_id = @visitorId
-  `,
+        select
+          id,
+          is_black_list isBlackList,
+          anti_passback antiPassback
+          from visitor_reg
+          where 1=1
+              and record_status = 'A'
+              and reg_id = @visitorId
+      `,
       { visitorId }
     );
     logger.info(regs.length);
     if (regs && regs.length > 0) {
       if (regs[0].isBlackList === 1) {
         return ScanVisitorResult.BLACKLIST;
+      } else if (regs[0].antiPassback === 1) {
+        return ScanVisitorResult.QUOTA_FULL;
       }
       doorOpen(deviceId);
       return ScanVisitorResult.OK;

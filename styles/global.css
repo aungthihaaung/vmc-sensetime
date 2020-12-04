@@ -35,18 +35,30 @@ img {
   font-family: sans-serif;
 }
 
-.title-div-ok {
+.title-ok {
   border: 5px solid #288692;
   width: 100%;
   display: table;
   height: 100px;
 }
 
-.title-div-not-found {
+.title-error {
   border: 5px solid #a02543;
+  background: #ceb12e;
   width: 100%;
   display: table;
   height: 100px;
+}
+
+.message-ok {
+  font-size: 30px;
+  color: #0a82be;
+  text-align: center;
+  font-weight: 700;
+}
+
+.title-error > div {
+  background: #ffb746;
 }
 
 .title-text {

@@ -1,5 +1,5 @@
-import React, { useState } from "react";
 import { ScanVisitorResult } from "lib/types";
+import React, { useState } from "react";
 
 export const getServerSideProps = ({ query, res }) => {
   return { props: { status: query.status, timeout: query.my_timeout } };
@@ -12,7 +12,9 @@ export default function Home({ status, timeout }) {
   let leftSidePanelImgMaxWidth = 0;
   let title = "";
   let message = "";
-  let titleDivStyleClass = "";
+  let message2 = "";
+  let titleStyleClass = "";
+  let messageStyleClass = "message"; // default is message
 
   setTimeout(() => {
     setShowLoading(true);
@@ -44,15 +46,35 @@ export default function Home({ status, timeout }) {
       "/images/man.webp";
     leftSidePanelImgMaxWidth = 150;
     title = "THANK YOU";
-    titleDivStyleClass = "title-div-ok";
+    titleStyleClass = "title-ok";
+    messageStyleClass = "message-ok";
     message = "Please Proceed to Enter";
+    message2 = "请继续输入。";
+  } else if (status === ScanVisitorResult.STAFF_OK) {
+    leftSidePanelImgPath =
+      // "https://recledmi.sirv.com/Images/vmc_sense_time/man.gif?w=150&h=250";
+      "/images/man.webp";
+    leftSidePanelImgMaxWidth = 150;
+    title = "STAFF";
+    titleStyleClass = "title-ok";
+    messageStyleClass = "message-ok";
+    message = "Please Proceed to Enter";
+    message2 = "请继续输入。";
+  } else if (status === ScanVisitorResult.QUOTA_FULL) {
+    leftSidePanelImgPath =
+      // "https://recledmi.sirv.com/Images/vmc_sense_time/stop_sign.png?w=150&h=250";
+      "/images/stop_sign.webp";
+    leftSidePanelImgMaxWidth = 150;
+    title = "QUOTA FULL";
+    titleStyleClass = "title-error";
+    message = "Entry quota is exceeded.";
   } else if (status === ScanVisitorResult.NOT_FOUND) {
     leftSidePanelImgPath =
       // "https://recledmi.sirv.com/Images/vmc_sense_time/stop_sign.png?w=150&h=250";
       "/images/stop_sign.webp";
     leftSidePanelImgMaxWidth = 150;
     title = "WARNING";
-    titleDivStyleClass = "title-div-not-found";
+    titleStyleClass = "title-error";
     message = "No record found.";
   } else if (status === ScanVisitorResult.BLACKLIST) {
     leftSidePanelImgPath =
@@ -60,7 +82,7 @@ export default function Home({ status, timeout }) {
       "/images/stop_sign.webp";
     leftSidePanelImgMaxWidth = 150;
     title = "ACCESS DENIED";
-    titleDivStyleClass = "title-div-not-found";
+    titleStyleClass = "title-error";
     message = "YOU SHALL NOT PASS!!!";
   }
 
@@ -92,7 +114,7 @@ export default function Home({ status, timeout }) {
       <div>
         <div style={{ height: 20 }}>&nbsp;</div>
       </div>
-      <div className={titleDivStyleClass}>
+      <div className={titleStyleClass}>
         <div className="title-text">{title}</div>
       </div>
 
@@ -115,7 +137,7 @@ export default function Home({ status, timeout }) {
                         <tr>
                           <td
                             style={{ verticalAlign: "middle", height: "50%" }}
-                            className="message"
+                            className={messageStyleClass}
                           >
                             <div>
                               {/* {message1 &&
@@ -123,6 +145,7 @@ export default function Home({ status, timeout }) {
                                 Parser(message1)} */}
                               {message}
                             </div>
+                            {message2.length > 0 && <div>{message2}</div>}
                           </td>
                         </tr>
                         {/* <tr>
