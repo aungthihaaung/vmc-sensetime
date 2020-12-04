@@ -18,8 +18,14 @@ export const getServerSideProps = async ({ query, res }) => {
 
   res.setHeader(
     "location",
-    `/result?timeout?${timeout}&status=${result}&visitor_id=${visitorId}&temp=${temperature}&device_id=${deviceId}`
+    `/result?timeout?${timeout}&status=${result}&visitor_id=${visitorId}&temp=${temperature}&device_id=${deviceId}&my_timeout=${timeout}`
   );
+
+  // res.setHeader(
+  //   "location",
+  //   `/result?timeout=${timeout}&status=BLACKLIST&visitor_id=${visitorId}&temp=${temperature}&device_id=${deviceId}`
+  // );
+
   res.statusCode = 302;
   res.end();
 
