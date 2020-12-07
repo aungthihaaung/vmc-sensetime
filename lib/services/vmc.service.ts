@@ -29,7 +29,9 @@ const scanVisitor = async (
   try {
     // @TEMP temporarily hard code for just demo.
     // should read from staff_reg table when all are in sync.
-    if (visitorId.indexOf("ST_") === 0) {
+    if (visitorId.indexOf("ST") === 0) {
+      doorOpen(deviceId);
+
       return ScanVisitorResult.STAFF_OK;
     }
 
