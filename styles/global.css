@@ -36,7 +36,6 @@ img {
 }
 
 .title-ok {
-<<<<<<< HEAD
 	border: 5px solid #288692;
 	width: 100%;
 	display: table;
@@ -60,31 +59,6 @@ img {
 
 .title-error > div {
 	background: #ffb746;
-=======
-  border: 5px solid #288692;
-  width: 100%;
-  display: table;
-  height: 100px;
-}
-
-.title-error {
-  border: 5px solid #a02543;
-  background: #ceb12e;
-  width: 100%;
-  display: table;
-  height: 100px;
->>>>>>> stg
-}
-
-.message-ok {
-  font-size: 30px;
-  color: #0a82be;
-  text-align: center;
-  font-weight: 700;
-}
-
-.title-error > div {
-  background: #ffb746;
 }
 
 .title-text {
@@ -197,15 +171,4 @@ img {
 .cc-logo-big > img {
 	/* width: 300px; */
 	/* width: 165px; */
-}
-
-.cc-logo-big {
-  position: absolute;
-  left: 29%;
-  top: 38%;
-}
-
-.cc-logo-big > img {
-  /* width: 300px; */
-  width: 165px;
 }
