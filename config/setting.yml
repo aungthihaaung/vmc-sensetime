@@ -4,7 +4,7 @@ port: 3000
 
 senseTimeApiUrl: http://192.168.18.7:8080/vmciif
 
-timeout: 7000
+timeout: 3000
 
 db:
   server: localhost
@@ -18,3 +18,9 @@ db:
     idleTimeoutMillis: 1
   options:
     useUTC: false
+
+# vmc
+# ttsh_kiosk
+demoMode: vmc
+
+sioUrl: http://127.0.0.1:4001

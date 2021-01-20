@@ -5,37 +5,37 @@ import React, { useState } from "react";
 import { ScanVisitorResult } from "lib/types";
 
 export const getServerSideProps = async ({ query, res }) => {
-  const {
-    visitor_id: visitorId,
-    device_id: deviceId,
-    temp: temperature,
-  } = query;
-  logger.info("scan", visitorId, temperature, deviceId);
+	const {
+		visitor_id: visitorId,
+		device_id: deviceId,
+		temp: temperature,
+	} = query;
+	logger.info("scan", visitorId, temperature, deviceId);
 
-  const result = await vmcService.scanVisitor(visitorId, temperature, deviceId);
-  logger.info(result);
-  const timeout = setting.timeout;
+	const result = await vmcService.scanVisitor(visitorId, temperature, deviceId);
+	logger.info(result);
+	const timeout = setting.timeout;
 
-  res.setHeader(
-    "location",
-    `/result?timeout?${timeout}&status=${result}&visitor_id=${visitorId}&temp=${temperature}&device_id=${deviceId}&my_timeout=${timeout}`
-  );
+	res.setHeader(
+		"location",
+		`/result?timeout?${timeout}&status=${result}&visitor_id=${visitorId}&temp=${temperature}&device_id=${deviceId}&my_timeout=${timeout}`
+	);
 
-  // res.setHeader(
-  //   "location",
-  //   `/result?timeout=${timeout}&status=BLACKLIST&visitor_id=${visitorId}&temp=${temperature}&device_id=${deviceId}`
-  // );
+	// res.setHeader(
+	//   "location",
+	//   `/result?timeout=${timeout}&status=BLACKLIST&visitor_id=${visitorId}&temp=${temperature}&device_id=${deviceId}`
+	// );
 
-  res.statusCode = 302;
-  res.end();
+	res.statusCode = 302;
+	res.end();
 
-  return { props: { status: "Loading..." } };
+	return { props: { status: "Loading..." } };
 };
 
 export default function Home({ status }) {
-  return (
-    <>
-      <div>{status}</div>
-    </>
-  );
+	return (
+		<>
+			<div>{status}</div>
+		</>
+	);
 }
