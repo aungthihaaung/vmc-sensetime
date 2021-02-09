@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next -p 3001",
+    "dev": "next -p 8088",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 8088",
     "stage": "pm2 start server.js --name vmc-sensetime"
   },
   "dependencies": {
