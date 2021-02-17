@@ -35,13 +35,14 @@ export default function Home({
 				senseTimeApiUrl={senseTimeApiUrl}
 			></VmcResult>
 		);
-	} else if (demoMode === "ttsh_kiosk") {
+	} else if (demoMode === "ttsh_kiosk" || demoMode === "ttsh_gantry") {
 		return (
 			<TtshKioskResult
 				sioUrl={sioUrl}
 				senseTimeDeviceId={deviceId}
 				temperature={temperature}
 				timeout={timeout}
+				mode={demoMode}
 			></TtshKioskResult>
 		);
 	}
