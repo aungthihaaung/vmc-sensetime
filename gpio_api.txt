@@ -1,0 +1,77 @@
+  0 import flask
+  1
+  2 from flask import request, jsonify
+  3
+  4 from gpiozero import LED
+  5 from time import sleep
+  6
+  7 # led = LED(18)
+  8 # led.on()
+  9
+ 10 def gpio_pulse(gpio_number):
+ 11     led = LED(gpio_number)
+ 12     led.on()
+ 13     print("LED on : " + str(gpio_number))
+ 14     sleep(1)
+ 15     led.off()
+ 16     sleep(1)
+ 17     led.on()
+ 18     print("LED off : " + str(gpio_number))
+ 19
+ 20 def gpio_on(gpio_number):
+ 21     led = LED(gpio_number)
+ 22     led.off()
+ 23     print("LED on : " + str(gpio_number))
+ 24
+ 25 def gpio_off(gpio_number):
+ 26     led = LED(gpio_number)
+ 27     led.on()
+ 28     print("LED on : " + str(gpio_number))
+ 29
+ 30 app = flask.Flask(__name__)
+ 31 app.config["DEBUG"] = True
+ 32
+ 33 @app.route('/api/gpio', methods=['POST'])
+ 34 def compare():
+ 35     body = request.get_json()
+ 36     gpio_number = body["gpioNumber"]
+ 37     # pulse, on, off
+ 38     action = body["action"]
+ 39
+ 40     print("gpioNumber : " + str(gpio_number))
+ 41     print("action : " + action)
+main.py                                                  
+
+ @app.route('/api/gpio', methods=['POST'])
+ 22 def compare():
+ 21     body = request.get_json()
+ 20     gpio_number = body["gpioNumber"]
+ 19     # pulse, on, off
+ 18     action = body["action"]
+ 17
+ 16     print("gpioNumber : " + str(gpio_number))
+ 15     print("action : " + action)
+ 14
+ 13     status = "OK"
+ 12
+ 11     if action == "pulse":
+ 10         gpio_pulse(gpio_number)
+  9     elif action == "on":
+  8         gpio_on(gpio_number)
+  7     elif action == "off":
+  6         gpio_off(gpio_number)
+  5     else:
+  4         status = "INVALID_ACTION"
+  3
+  2     return jsonify({ "status": status })
+  1
+  0 app.run(host='0.0.0.0', port=5000)
+
+
+   /lib/systemd/system/gpio_api.service
+  1
+  2 sudo chmod 644 /lib/systemd/system/sample.service
+  3
+  4 sudo systemctl daemon-reload
+  5 sudo systemctl enable gpio_api
+  6 sudo systemctl start gpio_api
