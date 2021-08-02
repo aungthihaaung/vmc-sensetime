@@ -3,7 +3,7 @@ import setting from "lib/misc/setting";
 import { ScanVisitorResult } from "lib/types";
 import { useState } from "react";
 
-export default function ({ status, timeout, senseTimeApiUrl }) {
+export default function VmcResult({ status, timeout, senseTimeApiUrl }) {
   const [showLoading, setShowLoading] = useState(false);
 
   let leftSidePanelImgPath = "";
@@ -50,6 +50,9 @@ export default function ({ status, timeout, senseTimeApiUrl }) {
   }
 
   const openDoor = () => {
+    // if (true) return;
+    //  alert(1);
+    console.log("*** openDoor");
     axios
       .post(`http://192.168.1.20:8080/vmciif/openDoor`, {
         id: 2,
@@ -85,6 +88,16 @@ export default function ({ status, timeout, senseTimeApiUrl }) {
       "/images/man.webp";
     leftSidePanelImgMaxWidth = 150;
     title = "STAFF";
+    titleStyleClass = "title-ok";
+    messageStyleClass = "message-ok";
+    message = "Please Proceed to Enter";
+    message2 = "请继续输入。";
+  } else if (status === ScanVisitorResult.STRANGER_OK) {
+    leftSidePanelImgPath =
+      // "https://recledmi.sirv.com/Images/vmc_sense_time/man.gif?w=150&h=250";
+      "/images/man.webp";
+    leftSidePanelImgMaxWidth = 150;
+    title = "VISITOR";
     titleStyleClass = "title-ok";
     messageStyleClass = "message-ok";
     message = "Please Proceed to Enter";

@@ -11,7 +11,7 @@ db:
   port: 1433
   user: sa
   password: W0rdpa55#123
-  database: SUNRAY_VMC
+  database: SUNRAY_VMC_SVR
   pool:
     min: 5
     max: 5
@@ -22,7 +22,7 @@ db:
 # vmc
 # ttsh_kiosk
 # ttsh_gantry
-demoMode: ttsh_gantry
+demoMode: vmc
 
 sioUrl: http://127.0.0.1:4001
 
