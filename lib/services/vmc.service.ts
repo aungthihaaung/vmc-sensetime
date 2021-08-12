@@ -4,92 +4,220 @@ import sqlLib from "lib/misc/sql";
 import setting from "lib/misc/setting";
 import { ScanVisitorResult } from "lib/types";
 import axios from "axios";
+import NodeCache from "node-cache";
+import { myKnex as knex } from "lib/misc/knex";
 
-const doorOpen = (id: number) => {
-  logger.info(`${setting.senseTimeApiUrl}/openDoor`, id);
+// default constants for data save
+const trDesc = "Valid Card Entry";
+const trCode = "Ca";
+const createdId = "GAN";
+const updatedId = "GAN";
+const recordStatus = "A";
 
-  axios
-    .post(`${setting.senseTimeApiUrl}/openDoor`, {
-      id: 2,
-      remark: "happy",
-    })
-    .then(function (response) {
-      logger.info(response.data);
-    })
-    .catch(function (error) {
-      logger.info(error);
-    });
+// https://www.npmjs.com/package/node-cache
+const myCache = new NodeCache({ stdTTL: 100, checkperiod: 120 });
+
+const CACHE_KEY = {
+  CONTROLLER_INFO: "CONTROLLER_INFO",
 };
 
-// const regGantryController = async (gantryId: number, ipAddress: string) => {
-// }
+interface Staff {
+  srId: number;
+  pId: number;
+  visIdentity: string;
+  contactNo: string;
+  passNo: string;
+  name: string;
+}
 
-const doorOpenByPi = (senseTimeDeviceId: number) => {
-  const hardCodedPiApiUrl = "http://192.168.1.200:5000/api/gpio";
-  const hardCodedPayload = { gpioNumber: 18, action: "pulse" };
-  logger.info(`hardCodedPiApiUrl`, hardCodedPiApiUrl);
-  logger.info(`hardCodedPayload`, hardCodedPayload);
+interface Controller {
+  id: number;
+  hostName: string;
+  port: number;
+  piGpioNumber: number;
+  controllerName: string;
+  controllerCode: string;
+}
 
-  axios
-    .post(hardCodedPiApiUrl, hardCodedPayload)
-    .then(function (response) {
-      logger.info("***", response.data);
-    })
-    .catch(function (error) {
-      logger.info("***", error);
-      logger.info(error);
-    });
+/**
+ * return single staff record by regId
+ * staff_reg.is_black_list must be 0
+ * staff_reg.date_of_resign is checked
+ * @param regId
+ * @returns { } | null
+ */
+const getStaff = async (regId: string): Promise<Staff> => {
+  const result = await sqlLib.query(
+    sql`
+    SELECT
+      sr.id srId,
+      p.id pId,
+      p.vis_identity visIdentity,
+      p.contact_no contactNo,
+      sr.pass_no passNo,
+      p.vis_name name
+    FROM
+      staff_reg sr
+      LEFT JOIN cd_personnel p ON sr.personnel_id = p.id
+    WHERE
+      1 = 1
+      AND sr.reg_id = @regId 
+      AND sr.record_status = 'A'
+      AND p.record_status = 'A'
+      AND sr.is_black_list = 0
+      AND (
+        sr.date_of_resign IS NULL
+        OR sr.date_of_resign >= getdate())`,
+    { regId }
+  );
+  if (result.length > 0) {
+    return result[0];
+  }
+  return null;
+};
+
+/**
+ * get controller ip and port by sensetime device id
+ * this query is cached
+ * @param senseTimeDeviceId
+ * @returns { } | null
+ */
+const getController = async (
+  senseTimeDeviceId: string
+): Promise<Controller> => {
+  const controllerCached: any = myCache.get(CACHE_KEY.CONTROLLER_INFO);
+  if (controllerCached == undefined) {
+    const result = await sqlLib.query(
+      sql`
+    SELECT
+        id,
+        host_name hostName,
+        port,
+        pi_gpio_number piGpioNumber,
+        controller_name controllerName,
+        controller_code controllerCode
+      FROM
+        cd_controller
+      WHERE
+        1 = 1
+        AND sensetime_device_id = @senseTimeDeviceId
+        AND record_status = 'A'  `,
+      { senseTimeDeviceId }
+    );
+    if (result.length > 0) {
+      myCache.set(CACHE_KEY.CONTROLLER_INFO, result[0]);
+      return result[0];
+    }
+    return null;
+  }
+  // serve from cache
+  return controllerCached;
+};
+
+const saveDeviceEvent = async (
+  staff: Staff,
+  controller: Controller,
+  temperature: number,
+  safeentryStatus: string
+) => {
+  await knex("deviceEvent").insert({
+    cardNo: staff.passNo,
+    ctrlIp: controller.hostName,
+    ctrlName: controller.controllerName,
+    devName: controller.controllerCode,
+    staffName: staff.name,
+    trDesc,
+    trCode,
+    tranTime: new Date(),
+    recordStatus,
+    createdId,
+    createdDt: new Date(),
+    updatedId,
+    updatedDt: new Date(),
+    temperature,
+    safeentryStatus,
+    staffRegId: staff.srId,
+    personnelId: staff.pId,
+    controllerId: controller.id,
+  });
+};
+
+const doorOpenSenseTime = (deviceId: string) => {
+  const url = `${setting.senseTimeApiUrl}/openDoor`;
+  const payload = {
+    id: deviceId,
+    remark: "happy",
+  };
+  logger.info(url, payload);
+
+  process.env.ENV !== "dev" &&
+    process.env.ENV !== "test" &&
+    axios
+      .post(`${setting.senseTimeApiUrl}/openDoor`, payload)
+      .then(function (response) {
+        logger.info("sensetime openDoor api response", response.data);
+      })
+      .catch(function (error) {
+        logger.error(error);
+      });
+};
+
+const doorOpenByPi = (hostName: string, port: number, gpioNumber: number) => {
+  const url = `http://${hostName}:${port}/api/gpio`;
+  const payload = { gpioNumber, action: "pulse" };
+
+  logger.info(url, payload);
+
+  process.env.ENV !== "dev" &&
+    process.env.ENV !== "test" &&
+    axios
+      .post(url, payload)
+      .then(function (response) {
+        logger.info("pi gpio api response", response.data);
+      })
+      .catch(function (error) {
+        logger.info(error);
+      });
+};
+
+const submitSafeentry = async (
+  identity: string,
+  contactNumber: string
+): Promise<string> => {
+  return "S";
 };
 
 const scanVisitor = async (
   visitorId: string,
   temperature: number,
-  deviceId: number
+  deviceId: string
 ) => {
   try {
-    // @TEMP temporarily hard code for just demo.
-    // should read from staff_reg table when all are in sync.
-    if (visitorId.indexOf("ST") === 0) {
-      doorOpen(deviceId);
-      // @TEMP temporarily hard code for just demo.
-      doorOpenByPi(deviceId);
-
-      return ScanVisitorResult.STAFF_OK;
-    } else if (visitorId.indexOf("null") === 0) {
-      // heeren changes. accept stranger.
-      doorOpen(deviceId);
-      // doorOpenByPi(deviceId);
-
+    if (visitorId === "null") {
+      doorOpenSenseTime(deviceId);
       return ScanVisitorResult.STRANGER_OK;
     }
 
-    const regs = await sqlLib.query(
-      sql`
-        select
-          id,
-          is_black_list isBlackList,
-          anti_passback antiPassback,
-          is_escort_required isEscortRequired
-          from visitor_reg
-          where 1=1
-              and record_status = 'A'
-              and reg_id = @visitorId
-      `,
-      { visitorId }
-    );
-    logger.info(regs);
-    if (regs && regs.length > 0) {
-      if (regs[0].isBlackList === 1) {
-        return ScanVisitorResult.BLACKLIST;
-      } else if (regs[0].antiPassback === 1) {
-        return ScanVisitorResult.QUOTA_FULL;
-      } else if (regs[0].isEscortRequired === 1) {
-        return ScanVisitorResult.ESCORT_REQUIRED;
-      }
-      doorOpen(deviceId);
-      return ScanVisitorResult.OK;
+    const staff = await getStaff(visitorId);
+    if (staff) {
+      const controller = await getController(deviceId);
+      const safeentryStatus = await submitSafeentry(
+        staff.visIdentity,
+        staff.contactNo
+      );
+
+      await saveDeviceEvent(staff, controller, temperature, safeentryStatus);
+
+      doorOpenSenseTime(deviceId);
+      doorOpenByPi(
+        controller.hostName,
+        controller.port,
+        controller.piGpioNumber
+      );
+
+      return ScanVisitorResult.STAFF_OK;
     } else {
-      return ScanVisitorResult.NOT_FOUND;
+      return ScanVisitorResult.STAFF_NOT_FOUND;
     }
   } catch (err) {
     logger.error(err);

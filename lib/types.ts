@@ -1,6 +1,7 @@
 export enum ScanVisitorResult {
   OK = "OK",
   STAFF_OK = "STAFF_OK",
+  STAFF_NOT_FOUND = "STAFF_NOT_FOUND",
   STRANGER_OK = "STRANGER_OK",
   NOT_FOUND = "NOT_FOUND",
   ERROR = "ERROR",

@@ -10,8 +10,8 @@ db:
   server: localhost
   port: 1433
   user: sa
-  password: W0rdpa55#123
-  database: SUNRAY_VMC_SVR
+  password: drone
+  database: HEEREN_VMC
   pool:
     min: 5
     max: 5
@@ -19,8 +19,8 @@ db:
   options:
     useUTC: false
 
-# vmc
 # ttsh_kiosk
+# vmc
 # ttsh_gantry
 demoMode: vmc
 

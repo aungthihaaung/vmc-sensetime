@@ -2,40 +2,39 @@ import sql, { ConnectionPool, Request } from "mssql";
 import setting from "lib/misc/setting";
 import logger from "lib/misc/logger";
 
-// https://stackoverflow.com/questions/30356148/how-can-i-use-a-single-mssql-connection-pool-across-several-routes-in-an-express
-const poolPromise = new sql.ConnectionPool(setting.db)
-  .connect()
-  .then((pool: ConnectionPool) => {
-    logger.info("Connected to MSSQL");
-    return pool;
+let poolPromise;
+let pool: any = null;
+
+const connect = (onConnected) => {
+  const connectionPool = new sql.ConnectionPool(setting.db);
+  poolPromise = connectionPool.connect().then((pool2) => {
+    logger.info("sql connected");
+    if (onConnected) {
+      onConnected();
+    }
+    return pool2;
   });
-// .catch((err) => logger.error("Database Connection Failed! ", err));
+};
+
+const disconnect = (onDisconnected) => {
+  if (pool) {
+    pool.close();
+  }
+  if (onDisconnected) {
+    onDisconnected();
+  }
+};
 
 // console.dir(setting.db_cfg);
 const execSql = async (sqlQuery, userInput = {}) => {
   logger.debug(sqlQuery, userInput);
 
   try {
-    const pool: ConnectionPool = await poolPromise;
-    let result: Request = await pool.request();
-    // let result = new sql.Request();
-    // for (const key in userInput) {
-    //   if (Array.isArray(userInput[key])) {
-    //     // input(field_name, dataType, value)
-    //     result = await result.input(key, sql.Int, userInput[key]);
-    //   } else {
-    //     // input(field_name, value)
-    //     result = await result.input(key, userInput[key]);
-    //   }
-    // }
+    pool = await poolPromise;
+    let result = pool.request();
+
     Object.keys(userInput).forEach((key) => {
-      // if (Array.isArray(userInput[key])) {
-      //   // input(field_name, dataType, value)
-      //   result = result.input(key, sql.Int, userInput[key]);
-      // } else {
-      // input(field_name, value)
       result = result.input(key, userInput[key]);
-      // }
     });
     const iResult = await result.query(sqlQuery);
 
@@ -62,4 +61,6 @@ const update = async function (sqlquery, userInput = {}) {
   return result.rowsAffected[0];
 };
 
-export default { query, update };
+process.env.ENV !== "test" && connect(null);
+
+export default { query, update, connect, disconnect };

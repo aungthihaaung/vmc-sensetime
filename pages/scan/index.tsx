@@ -13,19 +13,13 @@ export const getServerSideProps = async ({ query, res }) => {
   logger.info("scan", visitorId, temperature, deviceId);
 
   const result = await vmcService.scanVisitor(visitorId, temperature, deviceId);
+
   logger.info(result);
-  const timeout =
-    result === ScanVisitorResult.ESCORT_REQUIRED ? 1000 * 7 : setting.timeout;
 
   res.setHeader(
     "location",
-    `/result?timeout?${timeout}&status=${result}&visitor_id=${visitorId}&temp=${temperature}&device_id=${deviceId}&my_timeout=${timeout}`
+    `/result?timeout?${setting.timeout}&status=${result}&visitor_id=${visitorId}&temp=${temperature}&device_id=${deviceId}&my_timeout=${setting.timeout}`
   );
-
-  // res.setHeader(
-  //   "location",
-  //   `/result?timeout=${timeout}&status=BLACKLIST&visitor_id=${visitorId}&temp=${temperature}&device_id=${deviceId}`
-  // );
 
   res.statusCode = 302;
   res.end();
