@@ -14,10 +14,14 @@ export default function VmcResult({ status, timeout, senseTimeApiUrl }) {
   let titleStyleClass = "";
   let messageStyleClass = "message"; // default is message
   let qr = null;
+  let messageFontSize = 45;
+  let leftSidePanelImgDivStyle = {};
+  let messageTdStyle = {};
 
-  setTimeout(() => {
-    setShowLoading(true);
-  }, timeout);
+  // ##TEMP
+  // setTimeout(() => {
+  //   setShowLoading(true);
+  // }, timeout);
 
   if (showLoading) {
     return (
@@ -49,116 +53,50 @@ export default function VmcResult({ status, timeout, senseTimeApiUrl }) {
     );
   }
 
-  const openDoor = () => {
-    // if (true) return;
-    //  alert(1);
-    console.log("*** openDoor");
-    axios
-      .post(`http://192.168.1.20:8080/vmciif/openDoor`, {
-        id: 2,
-        remark: "happy",
-      })
-      .then(function (response) {
-        console.log(response.data);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  };
-
-  const clkGo = () => {
-    openDoor();
-    setTimeout(() => openDoor(), 100);
-  };
-
-  if (status === ScanVisitorResult.OK) {
+  if (status === ScanVisitorResult.STAFF_OK) {
     leftSidePanelImgPath =
       // "https://recledmi.sirv.com/Images/vmc_sense_time/man.gif?w=150&h=250";
       "/images/man.webp";
     leftSidePanelImgMaxWidth = 150;
-    title = "THANK YOU";
+    title = "WELCOME - STAFF";
     titleStyleClass = "title-ok";
     messageStyleClass = "message-ok";
     message = "Please Proceed to Enter";
-    message2 = "请继续输入。";
-    qr = "/images/cc_safe_entry_frame.webp";
-  } else if (status === ScanVisitorResult.STAFF_OK) {
-    leftSidePanelImgPath =
-      // "https://recledmi.sirv.com/Images/vmc_sense_time/man.gif?w=150&h=250";
-      "/images/man.webp";
-    leftSidePanelImgMaxWidth = 150;
-    title = "STAFF";
-    titleStyleClass = "title-ok";
-    messageStyleClass = "message-ok";
-    message = "Please Proceed to Enter";
-    message2 = "请继续输入。";
+    // message2 = "请继续输入。";
   } else if (status === ScanVisitorResult.STRANGER_OK) {
     leftSidePanelImgPath =
       // "https://recledmi.sirv.com/Images/vmc_sense_time/man.gif?w=150&h=250";
-      "/images/man.webp";
-    leftSidePanelImgMaxWidth = 150;
-    title = "VISITOR";
+      "/images/safe_entry.png";
+    leftSidePanelImgMaxWidth = 365;
+    title = "TRACE TOGETHER TOKEN";
     titleStyleClass = "title-ok";
     messageStyleClass = "message-ok";
-    message = "Please Proceed to Enter";
-    message2 = "请继续输入。";
-  } else if (status === ScanVisitorResult.QUOTA_FULL) {
+    leftSidePanelImgDivStyle = {
+      position: "absolute",
+      left: -20,
+      zIndex: 9,
+      bottom: 47,
+    };
+    messageTdStyle = { paddingBottom: 248 };
+    messageFontSize = 25;
+    message = "Please Scan your Trace Together Token";
+    // message2 = "请继续输入。";
+  } else if (status === ScanVisitorResult.STAFF_NOT_FOUND) {
     leftSidePanelImgPath =
       // "https://recledmi.sirv.com/Images/vmc_sense_time/stop_sign.png?w=150&h=250";
       "/images/stop_sign.webp";
-    leftSidePanelImgMaxWidth = 150;
-    title = "QUOTA FULL";
-    titleStyleClass = "title-error";
-    message = "Entry quota is exceeded.";
-  } else if (status === ScanVisitorResult.ESCORT_REQUIRED) {
-    leftSidePanelImgPath =
-      // "https://recledmi.sirv.com/Images/vmc_sense_time/stop_sign.png?w=150&h=250";
-      "/images/stop_sign.webp";
-    leftSidePanelImgMaxWidth = 150;
-    title = "ESCORT REQUIRED";
-    titleStyleClass = "title-error";
-    message = (
-      <>
-        Escort is needed.
-        <br />
-        <button
-          className="bg-red-500"
-          style={{
-            color: "white",
-            fontSize: 30,
-            borderRadius: 10,
-            paddingLeft: 10,
-            paddingRight: 10,
-            paddingBottom: 5,
-          }}
-          onClick={clkGo}
-        >
-          go
-        </button>
-      </>
-    );
-  } else if (status === ScanVisitorResult.NOT_FOUND) {
-    leftSidePanelImgPath =
-      // "https://recledmi.sirv.com/Images/vmc_sense_time/stop_sign.png?w=150&h=250";
-      "/images/stop_sign.webp";
-    leftSidePanelImgMaxWidth = 150;
-    title = "WARNING";
-    titleStyleClass = "title-error";
-    message = "No record found.";
-  } else if (status === ScanVisitorResult.BLACKLIST) {
-    leftSidePanelImgPath =
-      // "https://recledmi.sirv.com/Images/vmc_sense_time/stop_sign.png?w=150&h=250";
-      "/images/stop_sign.webp";
+
     leftSidePanelImgMaxWidth = 150;
     title = "ACCESS DENIED";
     titleStyleClass = "title-error";
-    message = "YOU SHALL NOT PASS!!!";
+    messageFontSize = 25;
+    message = "Please approach staff for further assistance.";
   }
 
   const leftPanel = (
     <div style={{ marginTop: 0 }}>
       <div>&nbsp;</div>
-      <div style={{ textAlign: "center" }}>
+      <div style={{ textAlign: "center", ...leftSidePanelImgDivStyle }}>
         {" "}
         <img
           src={leftSidePanelImgPath}
@@ -175,7 +113,8 @@ export default function VmcResult({ status, timeout, senseTimeApiUrl }) {
         <img
           src={
             // "https://recledmi.sirv.com/Images/vmc_sense_time/centricore.png?w=130&h=52"
-            "/images/centricore.webp"
+            // "/images/centricore.webp"
+            "/images/heeren.png"
           }
           alt="centricore"
         />
@@ -205,10 +144,14 @@ export default function VmcResult({ status, timeout, senseTimeApiUrl }) {
                       <tbody>
                         <tr>
                           <td
-                            style={{ verticalAlign: "middle", height: "50%" }}
+                            style={{
+                              verticalAlign: "middle",
+                              height: "50%",
+                              ...messageTdStyle,
+                            }}
                             className={messageStyleClass}
                           >
-                            <div>
+                            <div style={{ fontSize: messageFontSize }}>
                               {/* {message1 &&
                                 typeof message1 === "string" &&
                                 Parser(message1)} */}

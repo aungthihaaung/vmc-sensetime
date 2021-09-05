@@ -6,6 +6,12 @@ import { ScanVisitorResult } from "lib/types";
 import axios from "axios";
 import NodeCache from "node-cache";
 import { myKnex as knex } from "lib/misc/knex";
+import {
+  submitSafeEntry,
+  SE_ACTION_TYPE,
+  SE_PROFILE,
+  SE_SUB_TYPE,
+} from "safeentry-cli";
 
 // default constants for data save
 const trDesc = "Valid Card Entry";
@@ -180,12 +186,12 @@ const doorOpenByPi = (hostName: string, port: number, gpioNumber: number) => {
       });
 };
 
-const submitSafeentry = async (
-  identity: string,
-  contactNumber: string
-): Promise<string> => {
-  return "S";
-};
+// const submitSafeentry = async (
+//   identity: string,
+//   contactNumber: string
+// ): Promise<string> => {
+//   return "S";
+// };
 
 const scanVisitor = async (
   visitorId: string,
@@ -201,10 +207,16 @@ const scanVisitor = async (
     const staff = await getStaff(visitorId);
     if (staff) {
       const controller = await getController(deviceId);
-      const safeentryStatus = await submitSafeentry(
-        staff.visIdentity,
-        staff.contactNo
-      );
+      // staff.visIdentity,
+      // staff.contactNo
+      const safeentryStatus = await submitSafeEntry({
+        actionType: SE_ACTION_TYPE.CHECK_IN, // "checkin" || "checkout"
+        venueId: setting.safeEntry.stgVenueId,
+        subType: SE_SUB_TYPE.UINFIN, // "uinfin" || "others"
+        visitorIdentity: staff.visIdentity, // visitor id || safe entry token
+        mobileno: staff.contactNo,
+        profileName: SE_PROFILE.STG, // prd || stg
+      });
 
       await saveDeviceEvent(staff, controller, temperature, safeentryStatus);
 
