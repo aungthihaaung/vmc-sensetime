@@ -64,11 +64,13 @@ const logger = winston.createLogger({
 // `${info.level}: ${info.message} JSON.stringify({ ...rest }) `
 //
 // if (process.env.NODE_ENV !== "prod") {
-logger.add(
-  new winston.transports.Console({
-    format: combine(label({ label: "API-LOG" }), timestamp(), myFormat),
-  })
-);
+
+process.env.ENV !== "test" &&
+  logger.add(
+    new winston.transports.Console({
+      format: combine(label({ label: "API-LOG" }), timestamp(), myFormat),
+    })
+  );
 // }
 
 /**

@@ -19,6 +19,7 @@ describe("scan", () => {
   const visitorId = "ST_000006";
   const temperature = 1.1;
   const deviceId = "123";
+  const deviceIdDisabled = "456";
 
   const visitorIdWrong = "ST_000006_wrong";
   const visitorIdStranger = "null";
@@ -48,6 +49,15 @@ describe("scan", () => {
       deviceId
     );
     expect(result).toEqual(ScanVisitorResult.STRANGER_OK);
+  });
+
+  it("Lane disabled.", async () => {
+    const result = await vmcService.scanVisitor(
+      visitorIdStranger,
+      temperature,
+      deviceIdDisabled
+    );
+    expect(result).toEqual(ScanVisitorResult.LANE_DISABLED);
   });
 });
 

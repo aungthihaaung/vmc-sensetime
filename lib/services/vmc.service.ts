@@ -97,7 +97,8 @@ const getStaff = async (regId: string): Promise<Staff> => {
 const getController = async (
   senseTimeDeviceId: string
 ): Promise<Controller> => {
-  const controllerCached: any = myCache.get(CACHE_KEY.CONTROLLER_INFO);
+  const cacheKey = `${CACHE_KEY.CONTROLLER_INFO}_${senseTimeDeviceId}`;
+  const controllerCached: any = myCache.get(cacheKey);
   if (controllerCached == undefined) {
     const result = await sqlLib.query(
       sql`
@@ -117,7 +118,7 @@ const getController = async (
       { senseTimeDeviceId }
     );
     if (result.length > 0) {
-      myCache.set(CACHE_KEY.CONTROLLER_INFO, result[0]);
+      myCache.set(cacheKey, result[0]);
       return result[0];
     }
     return null;
@@ -133,13 +134,14 @@ const getController = async (
  * @returns { } | null
  */
 const getLane = async (senseTimeDeviceId: string): Promise<LaneStatus> => {
-  const laneCached: any = myCache.get(CACHE_KEY.LANE_INFO);
+  const cacheKey = `${CACHE_KEY.LANE_INFO}_${senseTimeDeviceId}`;
+  const laneCached: any = myCache.get(cacheKey);
   if (laneCached == undefined) {
     const result = await sqlLib.query(
       sql`
       SELECT
-        l.is_disabled,
-        a.action_code
+        l.is_disabled isDisabled,
+        a.action_code actionCode
       FROM
         cd_lane l
         LEFT JOIN cd_controller c ON l.controller_id = c.id
@@ -149,7 +151,7 @@ const getLane = async (senseTimeDeviceId: string): Promise<LaneStatus> => {
       { senseTimeDeviceId }
     );
     if (result.length > 0) {
-      myCache.set(CACHE_KEY.LANE_INFO, result[0]);
+      myCache.set(cacheKey, result[0]);
       return result[0];
     }
     return null;
@@ -238,6 +240,7 @@ const scanVisitor = async (
 ) => {
   try {
     const lane = await getLane(deviceId);
+    // console.log(`lane`, lane);
     if (lane.isDisabled === 1) {
       return ScanVisitorResult.LANE_DISABLED;
     }

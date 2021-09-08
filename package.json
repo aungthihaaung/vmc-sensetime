@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start -p 8088",
     "stage": "pm2 start server.js --name vmc-sensetime",
-    "test": "set ENV=test&& set NODE_PATH=.&& jest --silent=false --detectOpenHandles",
+    "test": "set ENV=test&& set NODE_PATH=.&& jest --silent=true --detectOpenHandles",
     "testCoverage": "jest --coverage"
   },
   "dependencies": {
