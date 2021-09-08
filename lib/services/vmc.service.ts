@@ -25,6 +25,7 @@ const myCache = new NodeCache({ stdTTL: 100, checkperiod: 120 });
 
 const CACHE_KEY = {
   CONTROLLER_INFO: "CONTROLLER_INFO",
+  LANE_INFO: "LANE_INFO",
 };
 
 interface Staff {
@@ -43,6 +44,11 @@ interface Controller {
   piGpioNumber: number;
   controllerName: string;
   controllerCode: string;
+}
+
+interface LaneStatus {
+  isDisabled: number;
+  actionCode: string;
 }
 
 /**
@@ -118,6 +124,38 @@ const getController = async (
   }
   // serve from cache
   return controllerCached;
+};
+
+/**
+ * get cd_lane.is_disabled and cd_lane.action_id
+ * this query is cached
+ * @param senseTimeDeviceId
+ * @returns { } | null
+ */
+const getLane = async (senseTimeDeviceId: string): Promise<LaneStatus> => {
+  const laneCached: any = myCache.get(CACHE_KEY.LANE_INFO);
+  if (laneCached == undefined) {
+    const result = await sqlLib.query(
+      sql`
+      SELECT
+        l.is_disabled,
+        a.action_code
+      FROM
+        cd_lane l
+        LEFT JOIN cd_controller c ON l.controller_id = c.id
+        LEFT JOIN cd_action a ON l.action_id = a.id
+      WHERE
+        c.sensetime_device_id = @senseTimeDeviceId  `,
+      { senseTimeDeviceId }
+    );
+    if (result.length > 0) {
+      myCache.set(CACHE_KEY.LANE_INFO, result[0]);
+      return result[0];
+    }
+    return null;
+  }
+  // serve from cache
+  return laneCached;
 };
 
 const saveDeviceEvent = async (
@@ -199,6 +237,11 @@ const scanVisitor = async (
   deviceId: string
 ) => {
   try {
+    const lane = await getLane(deviceId);
+    if (lane.isDisabled === 1) {
+      return ScanVisitorResult.LANE_DISABLED;
+    }
+
     if (visitorId === "null") {
       doorOpenSenseTime(deviceId);
       return ScanVisitorResult.STRANGER_OK;

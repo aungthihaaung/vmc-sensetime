@@ -91,6 +91,16 @@ export default function VmcResult({ status, timeout, senseTimeApiUrl }) {
     titleStyleClass = "title-error";
     messageFontSize = 25;
     message = "Please approach staff for further assistance.";
+  } else if (status === ScanVisitorResult.LANE_DISABLED) {
+    leftSidePanelImgPath =
+      // "https://recledmi.sirv.com/Images/vmc_sense_time/stop_sign.png?w=150&h=250";
+      "/images/stop_sign.webp";
+
+    leftSidePanelImgMaxWidth = 150;
+    title = "LANE IS CLOSED";
+    titleStyleClass = "title-error";
+    messageFontSize = 25;
+    message = "Please approach staff for further assistance.";
   }
 
   const leftPanel = (
