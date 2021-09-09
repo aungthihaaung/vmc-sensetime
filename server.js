@@ -18,7 +18,7 @@ app.prepare().then(() => {
   createServer(httpsOptions, (req, res) => {
     const parsedUrl = parse(req.url, true);
     handle(req, res, parsedUrl);
-  }).listen(8088, err => {
+  }).listen(8787, err => {
     if (err) throw err;
     console.log('> Ready on https://localhost:8086');
   });

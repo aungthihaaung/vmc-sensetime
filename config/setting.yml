@@ -9,8 +9,8 @@ timeout: 3000
 db:
   server: localhost
   port: 1433
-  user: sa
-  password: drone
+  user: ccheeren
+  password: P@#ss2021*
   database: HEEREN_VMC
   pool:
     min: 5

@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "set ENV=dev&& next -p 8088",
+    "dev": "set ENV=dev1&& next -p 8787",
     "build": "next build",
-    "start": "next start -p 8088",
+    "start": "next start -p 8787",
     "stage": "pm2 start server.js --name vmc-sensetime",
     "test": "set ENV=test&& set NODE_PATH=.&& jest --silent=true --detectOpenHandles",
     "testCoverage": "jest --coverage"

@@ -49,6 +49,7 @@ interface Controller {
 interface LaneStatus {
   isDisabled: number;
   actionCode: string;
+  sensetimeDeviceId: String;
 }
 
 /**
@@ -113,7 +114,7 @@ const getController = async (
         cd_controller
       WHERE
         1 = 1
-        AND sensetime_device_id = @senseTimeDeviceId
+        AND sensetime_product_no = @senseTimeDeviceId
         AND record_status = 'A'  `,
       { senseTimeDeviceId }
     );
@@ -141,13 +142,14 @@ const getLane = async (senseTimeDeviceId: string): Promise<LaneStatus> => {
       sql`
       SELECT
         l.is_disabled isDisabled,
-        a.action_code actionCode
+        a.action_code actionCode,
+        c.sensetime_device_id as sensetimeDeviceId
       FROM
         cd_lane l
         LEFT JOIN cd_controller c ON l.controller_id = c.id
         LEFT JOIN cd_action a ON l.action_id = a.id
       WHERE
-        c.sensetime_device_id = @senseTimeDeviceId  `,
+        c.sensetime_product_no = @senseTimeDeviceId  `,
       { senseTimeDeviceId }
     );
     if (result.length > 0) {
@@ -246,7 +248,7 @@ const scanVisitor = async (
     }
 
     if (visitorId === "null") {
-      doorOpenSenseTime(deviceId);
+      doorOpenSenseTime(lane.sensetimeDeviceId);
       return ScanVisitorResult.STRANGER_OK;
     }
 
@@ -255,23 +257,26 @@ const scanVisitor = async (
       const controller = await getController(deviceId);
       // staff.visIdentity,
       // staff.contactNo
-      const safeentryStatus = await submitSafeEntry({
-        actionType: SE_ACTION_TYPE.CHECK_IN, // "checkin" || "checkout"
-        venueId: setting.safeEntry.stgVenueId,
-        subType: SE_SUB_TYPE.UINFIN, // "uinfin" || "others"
-        visitorIdentity: staff.visIdentity, // visitor id || safe entry token
-        mobileno: staff.contactNo,
-        profileName: SE_PROFILE.STG, // prd || stg
-      });
-
+      // const safeentryStatus = await submitSafeEntry({
+      //   actionType: SE_ACTION_TYPE.CHECK_IN, // "checkin" || "checkout"
+      //   venueId: setting.safeEntry.stgVenueId,
+      //   subType: SE_SUB_TYPE.UINFIN, // "uinfin" || "others"
+      //   visitorIdentity: staff.visIdentity, // visitor id || safe entry token
+      //   mobileno: staff.contactNo,
+      //   profileName: SE_PROFILE.STG, // prd || stg
+      // });
+      const safeentryStatus = "Y"; 
       await saveDeviceEvent(staff, controller, temperature, safeentryStatus);
 
-      doorOpenSenseTime(deviceId);
-      doorOpenByPi(
-        controller.hostName,
-        controller.port,
-        controller.piGpioNumber
-      );
+      doorOpenSenseTime(lane.sensetimeDeviceId);
+      setTimeout(()=>{
+        doorOpenByPi(
+          controller.hostName,
+          controller.port,
+          controller.piGpioNumber
+        );
+      },4000);
+      
 
       return ScanVisitorResult.STAFF_OK;
     } else {
