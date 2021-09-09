@@ -18,10 +18,9 @@ export default function VmcResult({ status, timeout, senseTimeApiUrl }) {
   let leftSidePanelImgDivStyle = {};
   let messageTdStyle = {};
 
-  // ##TEMP
-  // setTimeout(() => {
-  //   setShowLoading(true);
-  // }, timeout);
+  setTimeout(() => {
+    setShowLoading(true);
+  }, timeout);
 
   if (showLoading) {
     return (
