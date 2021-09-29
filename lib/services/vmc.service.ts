@@ -49,7 +49,7 @@ interface Controller {
 interface LaneStatus {
   isDisabled: number;
   actionCode: string;
-  sensetimeDeviceId: String;
+  sensetimeDeviceId: string;
 }
 
 /**
@@ -190,7 +190,7 @@ const saveDeviceEvent = async (
   });
 };
 
-const doorOpenSenseTime = (deviceId: string) => {
+const doorOpenSenseTime = (deviceId: string, onSuccess: any) => {
   const url = `${setting.senseTimeApiUrl}/openDoor`;
   const payload = {
     id: deviceId,
@@ -204,6 +204,9 @@ const doorOpenSenseTime = (deviceId: string) => {
       .post(`${setting.senseTimeApiUrl}/openDoor`, payload)
       .then(function (response) {
         logger.info("sensetime openDoor api response", response.data);
+        if (onSuccess) {
+          onSuccess();
+        }
       })
       .catch(function (error) {
         logger.error(error);
@@ -248,7 +251,7 @@ const scanVisitor = async (
     }
 
     if (visitorId === "null") {
-      doorOpenSenseTime(lane.sensetimeDeviceId);
+      doorOpenSenseTime(lane.sensetimeDeviceId, null);
       return ScanVisitorResult.STRANGER_OK;
     }
 
@@ -265,18 +268,16 @@ const scanVisitor = async (
       //   mobileno: staff.contactNo,
       //   profileName: SE_PROFILE.STG, // prd || stg
       // });
-      const safeentryStatus = "Y"; 
+      const safeentryStatus = "Y";
       await saveDeviceEvent(staff, controller, temperature, safeentryStatus);
 
-      doorOpenSenseTime(lane.sensetimeDeviceId);
-      setTimeout(()=>{
+      doorOpenSenseTime(lane.sensetimeDeviceId, () => {
         doorOpenByPi(
           controller.hostName,
           controller.port,
           controller.piGpioNumber
         );
-      },4000);
-      
+      });
 
       return ScanVisitorResult.STAFF_OK;
     } else {
