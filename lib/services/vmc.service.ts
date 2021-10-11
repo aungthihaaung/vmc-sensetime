@@ -1,5 +1,5 @@
 import logger from "lib/misc/logger";
-import { sql } from "lib/misc/util";
+import { sql, getSqlNow } from "lib/misc/util";
 import sqlLib from "lib/misc/sql";
 import setting from "lib/misc/setting";
 import { ScanVisitorResult } from "lib/types";
@@ -12,6 +12,7 @@ import {
   SE_PROFILE,
   SE_SUB_TYPE,
 } from "safeentry-cli";
+import encryptor from "lib/misc/encryptor";
 
 // default constants for data save
 const trDesc = "Valid Card Entry";
@@ -176,12 +177,14 @@ const saveDeviceEvent = async (
     staffName: staff.name,
     trDesc,
     trCode,
-    tranTime: new Date(),
+    tranTime: getSqlNow(),
     recordStatus,
     createdId,
-    createdDt: new Date(),
+    createdDt: getSqlNow(),
     updatedId,
-    updatedDt: new Date(),
+    // updatedDt: new Date(),
+    // updatedDt: new Date("YYYY-MM-DD HH:mm:ss"),
+    updatedDt: getSqlNow(),
     temperature,
     safeentryStatus,
     staffRegId: staff.srId,
@@ -258,19 +261,27 @@ const scanVisitor = async (
     const staff = await getStaff(visitorId);
     if (staff) {
       const controller = await getController(deviceId);
-      // staff.visIdentity,
-      // staff.contactNo
-      // const safeentryStatus = await submitSafeEntry({
-      //   actionType: SE_ACTION_TYPE.CHECK_IN, // "checkin" || "checkout"
-      //   venueId: setting.safeEntry.stgVenueId,
-      //   subType: SE_SUB_TYPE.UINFIN, // "uinfin" || "others"
-      //   visitorIdentity: staff.visIdentity, // visitor id || safe entry token
-      //   mobileno: staff.contactNo,
-      //   profileName: SE_PROFILE.STG, // prd || stg
-      // });
-      const safeentryStatus = "Y";
-      await saveDeviceEvent(staff, controller, temperature, safeentryStatus);
+      // even if safe entry check in fail, let it pass
 
+      let safeentryStatus = "E";
+      try {
+        const visitorIdentity = encryptor.decrypt(staff.visIdentity);
+        const mobileno = encryptor.decrypt(staff.contactNo);
+        // logger.info(visitorIdentity, mobileno);
+        safeentryStatus = await submitSafeEntry({
+          actionType: SE_ACTION_TYPE.CHECK_IN, // "checkin" || "checkout"
+          venueId: setting.safeEntry.stgVenueId,
+          subType: SE_SUB_TYPE.UINFIN, // "uinfin" || "others"
+          visitorIdentity, // visitor id || safe entry token
+          mobileno,
+          profileName: SE_PROFILE.STG, // prd || stg
+        });
+        // safeentryStatus = "Y";
+      } catch (e) {
+        logger.error(e);
+      }
+
+      await saveDeviceEvent(staff, controller, temperature, safeentryStatus);
       doorOpenSenseTime(lane.sensetimeDeviceId, () => {
         doorOpenByPi(
           controller.hostName,
