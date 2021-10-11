@@ -274,11 +274,11 @@ const scanVisitor = async (
         // logger.info(visitorIdentity, mobileno);
         const safeEntryResponse = await submitSafeEntry({
           actionType: SE_ACTION_TYPE.CHECK_IN, // "checkin" || "checkout"
-          venueId: setting.safeEntry.stgVenueId,
+          venueId: setting.safeEntry.prdVenueId,
           subType: SE_SUB_TYPE.UINFIN, // "uinfin" || "others"
           visitorIdentity, // visitor id || safe entry token
           mobileno,
-          profileName: SE_PROFILE.STG, // prd || stg
+          profileName: SE_PROFILE.PRD, // prd || stg
         });
         // safeEntryResponse can be "Y" or "error message"
         if (safeEntryResponse === "Y") {
