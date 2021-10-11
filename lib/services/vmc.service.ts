@@ -15,8 +15,10 @@ import {
 import encryptor from "lib/misc/encryptor";
 
 // default constants for data save
-const trDesc = "Valid Card Entry";
-const trCode = "Ca";
+const trDescNormal = "Valid Card Entry";
+const trCodeNormal = "Ca";
+const trDescSafeEntryFail = "Safe Entry Fail";
+const trCodeSafeEntryFail = "Cc";
 const createdId = "GAN";
 const updatedId = "GAN";
 const recordStatus = "A";
@@ -167,7 +169,9 @@ const saveDeviceEvent = async (
   staff: Staff,
   controller: Controller,
   temperature: number,
-  safeentryStatus: string
+  safeentryStatus: string,
+  trCode: string,
+  trDesc: string
 ) => {
   await knex("deviceEvent").insert({
     cardNo: staff.passNo,
@@ -263,34 +267,63 @@ const scanVisitor = async (
       const controller = await getController(deviceId);
       // even if safe entry check in fail, let it pass
 
-      let safeentryStatus = "E";
+      let safeentryStatus;
       try {
         const visitorIdentity = encryptor.decrypt(staff.visIdentity);
         const mobileno = encryptor.decrypt(staff.contactNo);
         // logger.info(visitorIdentity, mobileno);
-        safeentryStatus = await submitSafeEntry({
+        const safeEntryResponse = await submitSafeEntry({
           actionType: SE_ACTION_TYPE.CHECK_IN, // "checkin" || "checkout"
-          venueId: setting.safeEntry.prdVenueId,
+          venueId: setting.safeEntry.stgVenueId,
           subType: SE_SUB_TYPE.UINFIN, // "uinfin" || "others"
           visitorIdentity, // visitor id || safe entry token
           mobileno,
-          profileName: SE_PROFILE.PRD, // prd || stg
+          profileName: SE_PROFILE.STG, // prd || stg
         });
-        // safeentryStatus = "Y";
+        // safeEntryResponse can be "Y" or "error message"
+        if (safeEntryResponse === "Y") {
+          safeentryStatus = "Y";
+        } else {
+          safeentryStatus = "E";
+          logger.error(safeEntryResponse);
+        }
       } catch (e) {
+        safeentryStatus = "E";
         logger.error(e);
       }
 
-      await saveDeviceEvent(staff, controller, temperature, safeentryStatus);
-      doorOpenSenseTime(lane.sensetimeDeviceId, () => {
-        doorOpenByPi(
-          controller.hostName,
-          controller.port,
-          controller.piGpioNumber
+      if (safeentryStatus === "Y") {
+        await saveDeviceEvent(
+          staff,
+          controller,
+          temperature,
+          safeentryStatus,
+          trCodeNormal,
+          trDescNormal
         );
-      });
+        doorOpenSenseTime(lane.sensetimeDeviceId, () => {
+          doorOpenByPi(
+            controller.hostName,
+            controller.port,
+            controller.piGpioNumber
+          );
+        });
 
-      return ScanVisitorResult.STAFF_OK;
+        return ScanVisitorResult.STAFF_OK;
+      } else {
+        // safe entry fail
+        await saveDeviceEvent(
+          staff,
+          controller,
+          temperature,
+          safeentryStatus,
+          trCodeSafeEntryFail,
+          trDescSafeEntryFail
+        );
+
+        logger.error("safe entry trigger fail");
+        return ScanVisitorResult.ERROR;
+      }
     } else {
       return ScanVisitorResult.STAFF_NOT_FOUND;
     }
