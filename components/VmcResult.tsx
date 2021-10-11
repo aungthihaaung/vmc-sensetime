@@ -57,7 +57,7 @@ export default function VmcResult({ status, timeout, senseTimeApiUrl }) {
       // "https://recledmi.sirv.com/Images/vmc_sense_time/man.gif?w=150&h=250";
       "/images/man.webp";
     leftSidePanelImgMaxWidth = 150;
-    title = "WELCOME - STAFF";
+    title = "WELCOME";
     titleStyleClass = "title-ok";
     messageStyleClass = "message-ok";
     message = "Please Proceed to Enter";
