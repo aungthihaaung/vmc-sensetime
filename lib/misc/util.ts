@@ -1,3 +1,5 @@
+import moment from "moment";
+
 export const sql = (literals, ...expressions) => {
   let string = ``;
   expressions.forEach((val, i) => {
@@ -67,4 +69,8 @@ export const format2 = function (...args) {
     }
   });
   return result;
+};
+
+export const getSqlNow = () => {
+  return moment().format("YYYY-MM-DD HH:mm:ss");
 };
