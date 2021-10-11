@@ -77,7 +77,7 @@ export default function VmcResult({ status, timeout, senseTimeApiUrl }) {
       bottom: 47,
     };
     messageTdStyle = { paddingBottom: 248 };
-    messageFontSize = 25;
+    messageFontSize = 35;
     message = "Please Scan your Trace Together Token";
     // message2 = "请继续输入。";
   } else if (status === ScanVisitorResult.STAFF_NOT_FOUND) {
