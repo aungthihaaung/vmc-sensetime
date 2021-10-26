@@ -9,6 +9,8 @@ timeout: 3000
 db:
   server: localhost
   port: 1433
+  # user: sa
+  # password: W0rdpa55#123
   user: ccheeren
   password: P@#ss2021*
   database: HEEREN_VMC
@@ -22,3 +24,5 @@ db:
 safeEntry:
   prdVenueId: PROD-T21MC0005J-539398-THEHEEREN-SE
   stgVenueId: STG-180000001W-83338-SEQRSELFTESTSINGLE-SE
+
+securityDisabledActionId: 3
