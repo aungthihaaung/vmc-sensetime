@@ -31,7 +31,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 		const piGpioNumberResult = await sqlLib.query(
 			sql`
 		SELECT
-			pi_gpio_number piGpioNumber
+			pi_direct_gpio_number piGpioNumber
 		FROM
 			cd_controller
 		WHERE
