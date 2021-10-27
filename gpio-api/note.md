@@ -27,3 +27,21 @@ WantedBy=multi-user.target
 ```
 dtoverlay=gpio-poweroff,gpiopin=14,active_low
 ```
+
+## patch
+- scp -r dir copy is not working & no idea why
+```
+
+scp D:\GitHub\vmc-sensetime\gpio-api\main.py pi@172.16.101.204:/home/pi/Documents/apps/gpio-api/main.py
+scp D:\GitHub\vmc-sensetime\gpio-api\config.py pi@172.16.101.204:/home/pi/Documents/apps/gpio-api/config.py
+scp D:\GitHub\vmc-sensetime\gpio-api\note.md pi@172.16.101.204:/home/pi/Documents/apps/gpio-api/note.md
+
+scp D:\GitHub\vmc-sensetime\gpio-api\main.py pi@172.16.101.206:/home/pi/Documents/apps/gpio-api/main.py
+scp D:\GitHub\vmc-sensetime\gpio-api\config.py pi@172.16.101.206:/home/pi/Documents/apps/gpio-api/config.py
+scp D:\GitHub\vmc-sensetime\gpio-api\note.md pi@172.16.101.206:/home/pi/Documents/apps/gpio-api/note.md
+
+scp D:\GitHub\vmc-sensetime\gpio-api\main.py pi@172.16.101.208:/home/pi/Documents/apps/gpio-api/main.py
+scp D:\GitHub\vmc-sensetime\gpio-api\config.py pi@172.16.101.208:/home/pi/Documents/apps/gpio-api/config.py
+scp D:\GitHub\vmc-sensetime\gpio-api\note.md pi@172.16.101.208:/home/pi/Documents/apps/gpio-api/note.md
+
+```
