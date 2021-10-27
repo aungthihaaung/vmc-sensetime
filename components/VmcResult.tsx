@@ -50,10 +50,7 @@ export default function VmcResult({ status, timeout, senseTimeApiUrl }) {
 		message = "Please Proceed to Enter";
 	} else if (status === ScanVisitorResult.STRANGER_OK) {
 		bottomImage = (
-			<img
-				src="/images/safe_entry.png"
-				style={{ width: 300, marginTop: 15 }}
-			></img>
+			<img src="/images/safe_entry.png" style={{ width: 300 }}></img>
 		);
 		message = "Please Scan your Trace Together Token";
 	} else if (status === ScanVisitorResult.STAFF_NOT_FOUND) {
@@ -98,7 +95,7 @@ export default function VmcResult({ status, timeout, senseTimeApiUrl }) {
 				<div style={messageFontSize ? { fontSize: messageFontSize } : {}}>
 					{message}
 				</div>
-				<div>{bottomImage}</div>
+				<div style={{ marginTop: 15 }}>{bottomImage}</div>
 			</div>
 		</div>
 	);
