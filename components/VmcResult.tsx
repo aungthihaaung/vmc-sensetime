@@ -10,10 +10,9 @@ export default function VmcResult({ status, timeout, senseTimeApiUrl }) {
 	let message;
 	let messageFontSize = null;
 
-	// ## TEMP
-	// setTimeout(() => {
-	//   setShowLoading(true);
-	// }, timeout);
+	setTimeout(() => {
+		setShowLoading(true);
+	}, timeout);
 
 	if (showLoading) {
 		return (
