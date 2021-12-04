@@ -16,15 +16,14 @@ afterAll((done) => {
 });
 
 describe("scan", () => {
-	const visitorId = "ST_000006";
+	const visitorId = "TE_000021";
 	const temperature = 1.1;
 	const deviceId = "123";
-	const deviceIdDisabled = "456";
 
-	const visitorIdWrong = "ST_000006_wrong";
+	const visitorIdWrong = "TE_000021_wrong";
 	const visitorIdStranger = "null";
 
-	it("Staff found.", async () => {
+	it("Tenant found.", async () => {
 		const result = await vmcService.scanVisitor(
 			visitorId,
 			temperature,
@@ -33,31 +32,13 @@ describe("scan", () => {
 		expect(result).toEqual(ScanVisitorResult.STAFF_OK);
 	});
 
-	it("Staff not found.", async () => {
+	it("Tenant not found.", async () => {
 		const result = await vmcService.scanVisitor(
 			visitorIdWrong,
 			temperature,
 			deviceId
 		);
 		expect(result).toEqual(ScanVisitorResult.STAFF_NOT_FOUND);
-	});
-
-	it("Stranger.", async () => {
-		const result = await vmcService.scanVisitor(
-			visitorIdStranger,
-			temperature,
-			deviceId
-		);
-		expect(result).toEqual(ScanVisitorResult.STRANGER_OK);
-	});
-
-	it("Lane disabled.", async () => {
-		const result = await vmcService.scanVisitor(
-			visitorIdStranger,
-			temperature,
-			deviceIdDisabled
-		);
-		expect(result).toEqual(ScanVisitorResult.LANE_DISABLED);
 	});
 });
 
