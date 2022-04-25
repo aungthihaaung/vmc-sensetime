@@ -7,10 +7,10 @@ import axios from "axios";
 import NodeCache from "node-cache";
 import { myKnex as knex } from "lib/misc/knex";
 import {
-	submitSafeEntry,
-	SE_ACTION_TYPE,
-	SE_PROFILE,
-	SE_SUB_TYPE,
+  submitSafeEntry,
+  SE_ACTION_TYPE,
+  SE_PROFILE,
+  SE_SUB_TYPE
 } from "safeentry-cli";
 import encryptor from "lib/misc/encryptor";
 
@@ -27,41 +27,41 @@ const recordStatus = "A";
 const myCache = new NodeCache({ stdTTL: 100, checkperiod: 120 });
 
 const CACHE_KEY = {
-	CONTROLLER_INFO: "CONTROLLER_INFO",
-	LANE_INFO: "LANE_INFO",
+  CONTROLLER_INFO: "CONTROLLER_INFO",
+  LANE_INFO: "LANE_INFO"
 };
 
 interface Staff {
-	srId: number;
-	pId: number;
-	visIdentity: string;
-	contactNo: string;
-	passNo: string;
-	name: string;
+  srId: number;
+  pId: number;
+  visIdentity: string;
+  contactNo: string;
+  passNo: string;
+  name: string;
 }
 
 interface Tenant {
-	trId: number;
-	pId: number;
-	visIdentity: string;
-	contactNo: string;
-	passNo: string;
-	name: string;
+  trId: number;
+  pId: number;
+  visIdentity: string;
+  contactNo: string;
+  passNo: string;
+  name: string;
 }
 
 interface Controller {
-	id: number;
-	hostName: string;
-	port: number;
-	piGpioNumber: number;
-	controllerName: string;
-	controllerCode: string;
+  id: number;
+  hostName: string;
+  port: number;
+  piGpioNumber: number;
+  controllerName: string;
+  controllerCode: string;
 }
 
 interface LaneStatus {
-	isDisabled: number;
-	actionCode: string;
-	sensetimeDeviceId: string;
+  isDisabled: number;
+  actionCode: string;
+  sensetimeDeviceId: string;
 }
 
 /**
@@ -72,8 +72,8 @@ interface LaneStatus {
  * @returns { } | null
  */
 const getStaff = async (regId: string): Promise<Staff> => {
-	const result = await sqlLib.query(
-		sql`
+  const result = await sqlLib.query(
+    sql`
     SELECT
       sr.id srId,
       p.id pId,
@@ -93,17 +93,17 @@ const getStaff = async (regId: string): Promise<Staff> => {
       AND (
         sr.date_of_resign IS NULL
         OR sr.date_of_resign >= getdate())`,
-		{ regId }
-	);
-	if (result.length > 0) {
-		return result[0];
-	}
-	return null;
+    { regId }
+  );
+  if (result.length > 0) {
+    return result[0];
+  }
+  return null;
 };
 
 const getTenant = async (regId: string): Promise<Tenant> => {
-	const result = await sqlLib.query(
-		sql`
+  const result = await sqlLib.query(
+    sql`
     SELECT
       tr.id trId,
       p.id pId,
@@ -123,12 +123,12 @@ const getTenant = async (regId: string): Promise<Tenant> => {
       AND (
         tr.date_of_expire IS NULL
         OR tr.date_of_expire >= getdate())`,
-		{ regId }
-	);
-	if (result.length > 0) {
-		return result[0];
-	}
-	return null;
+    { regId }
+  );
+  if (result.length > 0) {
+    return result[0];
+  }
+  return null;
 };
 
 /**
@@ -138,13 +138,13 @@ const getTenant = async (regId: string): Promise<Tenant> => {
  * @returns { } | null
  */
 const getController = async (
-	senseTimeDeviceId: string
+  senseTimeDeviceId: string
 ): Promise<Controller> => {
-	const cacheKey = `${CACHE_KEY.CONTROLLER_INFO}_${senseTimeDeviceId}`;
-	const controllerCached: any = myCache.get(cacheKey);
-	if (controllerCached == undefined) {
-		const result = await sqlLib.query(
-			sql`
+  const cacheKey = `${CACHE_KEY.CONTROLLER_INFO}_${senseTimeDeviceId}`;
+  const controllerCached: any = myCache.get(cacheKey);
+  if (controllerCached == undefined) {
+    const result = await sqlLib.query(
+      sql`
     SELECT
         id,
         host_name hostName,
@@ -158,16 +158,16 @@ const getController = async (
         1 = 1
         AND sensetime_product_no = @senseTimeDeviceId
         AND record_status = 'A'  `,
-			{ senseTimeDeviceId }
-		);
-		if (result.length > 0) {
-			myCache.set(cacheKey, result[0]);
-			return result[0];
-		}
-		return null;
-	}
-	// serve from cache
-	return controllerCached;
+      { senseTimeDeviceId }
+    );
+    if (result.length > 0) {
+      myCache.set(cacheKey, result[0]);
+      return result[0];
+    }
+    return null;
+  }
+  // serve from cache
+  return controllerCached;
 };
 
 /**
@@ -177,11 +177,11 @@ const getController = async (
  * @returns { } | null
  */
 const getLane = async (senseTimeDeviceId: string): Promise<LaneStatus> => {
-	const cacheKey = `${CACHE_KEY.LANE_INFO}_${senseTimeDeviceId}`;
-	const laneCached: any = myCache.get(cacheKey);
-	if (laneCached == undefined) {
-		const result = await sqlLib.query(
-			sql`
+  const cacheKey = `${CACHE_KEY.LANE_INFO}_${senseTimeDeviceId}`;
+  const laneCached: any = myCache.get(cacheKey);
+  if (laneCached == undefined) {
+    const result = await sqlLib.query(
+      sql`
       SELECT
         l.is_disabled isDisabled,
         a.action_code actionCode,
@@ -192,91 +192,91 @@ const getLane = async (senseTimeDeviceId: string): Promise<LaneStatus> => {
         LEFT JOIN cd_action a ON l.action_id = a.id
       WHERE
         c.sensetime_product_no = @senseTimeDeviceId  `,
-			{ senseTimeDeviceId }
-		);
-		if (result.length > 0) {
-			myCache.set(cacheKey, result[0]);
-			return result[0];
-		}
-		return null;
-	}
-	// serve from cache
-	return laneCached;
+      { senseTimeDeviceId }
+    );
+    if (result.length > 0) {
+      myCache.set(cacheKey, result[0]);
+      return result[0];
+    }
+    return null;
+  }
+  // serve from cache
+  return laneCached;
 };
 
 const saveDeviceEvent = async (
-	staff: Staff,
-	tenant: Tenant,
-	controller: Controller,
-	temperature: number,
-	safeentryStatus: string,
-	trCode: string,
-	trDesc: string
+  staff: Staff,
+  tenant: Tenant,
+  controller: Controller,
+  temperature: number,
+  safeentryStatus: string,
+  trCode: string,
+  trDesc: string
 ) => {
-	await knex("deviceEvent").insert({
-		cardNo: staff ? staff.passNo : tenant.passNo,
-		ctrlIp: controller.hostName,
-		ctrlName: controller.controllerName,
-		devName: controller.controllerCode,
-		staffName: staff ? staff.name : tenant.name,
-		trDesc,
-		trCode,
-		tranTime: getSqlNow(),
-		recordStatus,
-		createdId,
-		createdDt: getSqlNow(),
-		updatedId,
-		// updatedDt: new Date(),
-		// updatedDt: new Date("YYYY-MM-DD HH:mm:ss"),
-		updatedDt: getSqlNow(),
-		temperature,
-		safeentryStatus,
-		staffRegId: staff ? staff.srId : null,
-		tenantRegId: tenant ? tenant.trId : null,
-		personnelId: staff ? staff.pId : tenant.pId,
-		controllerId: controller.id,
-	});
+  await knex("deviceEvent").insert({
+    cardNo: staff ? staff.passNo : tenant.passNo,
+    ctrlIp: controller.hostName,
+    ctrlName: controller.controllerName,
+    devName: controller.controllerCode,
+    staffName: staff ? staff.name : tenant.name,
+    trDesc,
+    trCode,
+    tranTime: getSqlNow(),
+    recordStatus,
+    createdId,
+    createdDt: getSqlNow(),
+    updatedId,
+    // updatedDt: new Date(),
+    // updatedDt: new Date("YYYY-MM-DD HH:mm:ss"),
+    updatedDt: getSqlNow(),
+    temperature,
+    safeentryStatus,
+    staffRegId: staff ? staff.srId : null,
+    tenantRegId: tenant ? tenant.trId : null,
+    personnelId: staff ? staff.pId : tenant.pId,
+    controllerId: controller.id
+  });
 };
 
 const doorOpenSenseTime = (deviceId: string, onSuccess: any) => {
-	const url = `${setting.senseTimeApiUrl}/openDoor`;
-	const payload = {
-		id: deviceId,
-		remark: "happy",
-	};
-	logger.info(url, payload);
+  const url = `${setting.senseTimeApiUrl}/openDoor`;
+  const payload = {
+    id: deviceId,
+    remark: "happy"
+  };
+  logger.info(url, payload);
 
-	process.env.ENV !== "dev" &&
-		process.env.ENV !== "test" &&
-		axios
-			.post(`${setting.senseTimeApiUrl}/openDoor`, payload)
-			.then(function (response) {
-				logger.info("sensetime openDoor api response", response.data);
-				if (onSuccess) {
-					onSuccess();
-				}
-			})
-			.catch(function (error) {
-				logger.error(error);
-			});
+  process.env.ENV !== "dev" &&
+    process.env.ENV !== "test" &&
+    axios
+      .post(`${setting.senseTimeApiUrl}/openDoor`, payload)
+      .then(function (response) {
+        logger.info("sensetime openDoor api response", response.data);
+        if (onSuccess) {
+          onSuccess();
+        }
+      })
+      .catch(function (error) {
+        logger.error(error);
+      });
 };
 
 const doorOpenByPi = (hostName: string, port: number, gpioNumber: number) => {
-	const url = `http://${hostName}:${port}/api/gpio`;
-	const payload = { gpioNumber, action: "pulse" };
+  const url = `http://${hostName}:${port}/api/gpio`;
+  const payload = { gpioNumber, action: "pulse" };
 
-	logger.info(url, payload);
+  logger.info(url, payload);
 
-	process.env.ENV !== "dev" &&
-		process.env.ENV !== "test" &&
-		axios
-			.post(url, payload)
-			.then(function (response) {
-				logger.info("pi gpio api response", response.data);
-			})
-			.catch(function (error) {
-				logger.info(error);
-			});
+  process.env.ENV !== "dev" &&
+    process.env.ENV !== "test" &&
+    axios
+      .post(url, payload)
+      .then(function (response) {
+        logger.info("pi gpio api response", response.data);
+      })
+      .catch(function (error) {
+        logger.info(error);
+      });
 };
 
 // const submitSafeentry = async (
@@ -287,109 +287,119 @@ const doorOpenByPi = (hostName: string, port: number, gpioNumber: number) => {
 // };
 
 const scanVisitor = async (
-	visitorId: string,
-	temperature: number,
-	deviceId: string
+  visitorId: string,
+  temperature: number,
+  deviceId: string
 ) => {
-	try {
-		const lane = await getLane(deviceId);
-		// console.log(`lane`, lane);
-		if (lane.isDisabled === 1) {
-			return ScanVisitorResult.LANE_DISABLED;
-		}
+  try {
+    const lane = await getLane(deviceId);
+    // console.log(`lane`, lane);
+    if (lane.isDisabled === 1) {
+      return ScanVisitorResult.LANE_DISABLED;
+    }
 
-		if (visitorId === "null") {
-			doorOpenSenseTime(lane.sensetimeDeviceId, null);
-			return ScanVisitorResult.STRANGER_OK;
-		}
+    const controller = await getController(deviceId);
 
-		let staff = null;
-		let tenant = null;
-		// ST = staff
-		// TE = tenant
-		if (visitorId.startsWith("ST")) {
-			staff = await getStaff(visitorId);
-		} else if (visitorId.startsWith("TE")) {
-			tenant = await getTenant(visitorId);
-		}
+    if (visitorId === "null") {
+      // doorOpenSenseTime(lane.sensetimeDeviceId, null);
 
-		if (staff || tenant) {
-			const controller = await getController(deviceId);
-			// even if safe entry check in fail, let it pass
+      doorOpenSenseTime(lane.sensetimeDeviceId, () => {
+        doorOpenByPi(
+          controller.hostName,
+          controller.port,
+          controller.piGpioNumber
+        );
+      });
 
-			let safeentryStatus;
-			try {
-				const visitorIdentity = encryptor.decrypt(
-					staff ? staff.visIdentity : tenant.visIdentity
-				);
-				const mobileno = encryptor.decrypt(
-					staff ? staff.contactNo : tenant.contactNo
-				);
-				// logger.info(visitorIdentity, mobileno);
-				const safeEntryResponse =
-					process.env.ENV === "test"
-						? "Y"
-						: await submitSafeEntry({
-								actionType: SE_ACTION_TYPE.CHECK_IN, // "checkin" || "checkout"
-								venueId: setting.safeEntry.prdVenueId,
-								subType: SE_SUB_TYPE.UINFIN, // "uinfin" || "others"
-								visitorIdentity, // visitor id || safe entry token
-								mobileno,
-								profileName: SE_PROFILE.PRD, // prd || stg
-						  });
-				// safeEntryResponse can be "Y" or "error message"
-				if (safeEntryResponse === "Y") {
-					safeentryStatus = "Y";
-				} else {
-					safeentryStatus = "E";
-					logger.error(safeEntryResponse);
-				}
-			} catch (e) {
-				safeentryStatus = "E";
-				logger.error(e);
-			}
+      return ScanVisitorResult.STRANGER_OK;
+    }
 
-			if (safeentryStatus === "Y") {
-				await saveDeviceEvent(
-					staff,
-					tenant,
-					controller,
-					temperature,
-					safeentryStatus,
-					trCodeNormal,
-					trDescNormal
-				);
-				doorOpenSenseTime(lane.sensetimeDeviceId, () => {
-					doorOpenByPi(
-						controller.hostName,
-						controller.port,
-						controller.piGpioNumber
-					);
-				});
+    let staff = null;
+    let tenant = null;
+    // ST = staff
+    // TE = tenant
+    if (visitorId.startsWith("ST")) {
+      staff = await getStaff(visitorId);
+    } else if (visitorId.startsWith("TE")) {
+      tenant = await getTenant(visitorId);
+    }
 
-				return ScanVisitorResult.STAFF_OK;
-			} else {
-				// safe entry fail
-				await saveDeviceEvent(
-					staff,
-					tenant,
-					controller,
-					temperature,
-					safeentryStatus,
-					trCodeSafeEntryFail,
-					trDescSafeEntryFail
-				);
+    if (staff || tenant) {
+      // even if safe entry check in fail, let it pass
 
-				logger.error("safe entry trigger fail");
-				return ScanVisitorResult.ERROR;
-			}
-		} else {
-			return ScanVisitorResult.STAFF_NOT_FOUND;
-		}
-	} catch (err) {
-		logger.error(err);
-		return ScanVisitorResult.ERROR;
-	}
+      let safeentryStatus = "Y";
+      // try {
+      // const visitorIdentity = encryptor.decrypt(
+      //   staff ? staff.visIdentity : tenant.visIdentity
+      // );
+      // const mobileno = encryptor.decrypt(
+      //   staff ? staff.contactNo : tenant.contactNo
+      // );
+      // logger.info(visitorIdentity, mobileno);
+      // const safeEntryResponse =
+      //   process.env.ENV === "test"
+      //     ? "Y"
+      //     : await submitSafeEntry({
+      //         actionType: SE_ACTION_TYPE.CHECK_IN, // "checkin" || "checkout"
+      //         venueId: setting.safeEntry.prdVenueId,
+      //         subType: SE_SUB_TYPE.UINFIN, // "uinfin" || "others"
+      //         visitorIdentity, // visitor id || safe entry token
+      //         mobileno,
+      //         profileName: SE_PROFILE.PRD // prd || stg
+      //       });
+      // safeEntryResponse can be "Y" or "error message"
+      // if (safeEntryResponse === "Y") {
+      //   safeentryStatus = "Y";
+      // } else {
+      //   safeentryStatus = "E";
+      //   logger.error(safeEntryResponse);
+      // }
+      // } catch (e) {
+      //   safeentryStatus = "E";
+      //   logger.error(e);
+      // }
+
+      // if (safeentryStatus === "Y") {
+      await saveDeviceEvent(
+        staff,
+        tenant,
+        controller,
+        temperature,
+        safeentryStatus,
+        trCodeNormal,
+        trDescNormal
+      );
+      doorOpenSenseTime(lane.sensetimeDeviceId, () => {
+        doorOpenByPi(
+          controller.hostName,
+          controller.port,
+          controller.piGpioNumber
+        );
+      });
+
+      return ScanVisitorResult.STAFF_OK;
+      // } else {
+      //   // safe entry fail
+      //   await saveDeviceEvent(
+      //     staff,
+      //     tenant,
+      //     controller,
+      //     temperature,
+      //     safeentryStatus,
+      //     trCodeSafeEntryFail,
+      //     trDescSafeEntryFail
+      //   );
+
+      //   logger.error("safe entry trigger fail");
+      //   return ScanVisitorResult.ERROR;
+      // }
+    } else {
+      return ScanVisitorResult.STAFF_NOT_FOUND;
+    }
+  } catch (err) {
+    logger.error(err);
+    return ScanVisitorResult.ERROR;
+  }
 };
 
 export default { scanVisitor };
